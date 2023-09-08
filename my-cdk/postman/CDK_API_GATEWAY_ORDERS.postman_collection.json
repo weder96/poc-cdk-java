@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "c330688f-d019-400c-891b-8975941d9dd8",
+		"name": "CDK_API_GATEWAY_ORDERS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CREATE ITEM",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{     \n    \"orderDate\": \"2023-09-07\",\n    \"status\": \"IN_PROGRESS\", \n    \"desc\": \"Xiomi readmi 12C\", \n    \"updateOrderDate\": \"2023-09-07\",\n    \"Name\": \"Weder Sousa2\",\n    \"Email\": \"weder.sousa96@handson.cloud\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://kp90ktq1qb.execute-api.us-east-1.amazonaws.com/prod/items",
+					"protocol": "https",
+					"host": [
+						"kp90ktq1qb",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"prod",
+						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET ALL ITEMS",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://kp90ktq1qb.execute-api.us-east-1.amazonaws.com/prod/items",
+					"protocol": "https",
+					"host": [
+						"kp90ktq1qb",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"prod",
+						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET ITEM BY ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://kp90ktq1qb.execute-api.us-east-1.amazonaws.com/prod/items/c0fe2aa0-a1d0-4d86-8091-ff76dda73086",
+					"protocol": "https",
+					"host": [
+						"kp90ktq1qb",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"prod",
+						"items",
+						"c0fe2aa0-a1d0-4d86-8091-ff76dda73086"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE ITEM BY ID",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://kp90ktq1qb.execute-api.us-east-1.amazonaws.com/prod/items/47997870-b630-4552-b660-6b9f99ea1f04",
+					"protocol": "https",
+					"host": [
+						"kp90ktq1qb",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"prod",
+						"items",
+						"47997870-b630-4552-b660-6b9f99ea1f04"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE ITEM",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{         \n    \"status\": \"CANCELED\", \n    \"updateOrderDate\": \"2023-09-08\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://kp90ktq1qb.execute-api.us-east-1.amazonaws.com/prod/items/c0fe2aa0-a1d0-4d86-8091-ff76dda73086",
+					"protocol": "https",
+					"host": [
+						"kp90ktq1qb",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"prod",
+						"items",
+						"c0fe2aa0-a1d0-4d86-8091-ff76dda73086"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
