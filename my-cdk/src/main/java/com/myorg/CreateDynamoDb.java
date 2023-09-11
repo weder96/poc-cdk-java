@@ -1,5 +1,6 @@
 package com.myorg;
 
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.apigateway.*;
@@ -21,39 +22,25 @@ public class CreateDynamoDb {
     }
 
     public  void cdkDynamodb(MyStack myStack){
-        TableProps tableProps;
-
-        Attribute partitionKey = Attribute.builder().name("orderId").type(AttributeType.STRING).build();
-
-        // The default removal policy is RETAIN, which means that cdk destroy will not attempt to delete
-        // the new table, and it will remain in your account until manually deleted. By setting the policy to
-        // DESTROY, cdk destroy will delete the table (even if it has data in it)
-        tableProps = TableProps.builder().tableName("orders").partitionKey(partitionKey).removalPolicy(RemovalPolicy.DESTROY).build();
+        TableProps tableProps = createTablePropsDynamoDB(myStack);
         Table dynamodbTable = new Table(myStack, "orders", tableProps);
-
-        Map<String, String> lambdaEnvMap = new HashMap<>();
-        lambdaEnvMap.put("TABLE_NAME", dynamodbTable.getTableName());
-        lambdaEnvMap.put("PRIMARY_KEY","id");
-        lambdaEnvMap.put("SORT_KEY","orderDate");
+        Map<String, String> lambdaEnvMap = createLambdaEnvMap(dynamodbTable);
 
         Role role = createLambdaRole(myStack);
 
-        Function getOneItemFunction = new Function(myStack, "getOneItemFunction", getLambdaFunctionProps(myStack, role, lambdaEnvMap, "getOneItem","py"));
-        Function getAllItemsFunction = new Function(myStack, "getAllItemsFunction", getLambdaFunctionProps(myStack,role, lambdaEnvMap, "getAllItems","py"));
-        Function createItemFunction = new Function(myStack, "createItemFunction", getLambdaFunctionProps(myStack,role, lambdaEnvMap, "createItem","py"));
-        Function updateItemFunction = new Function(myStack, "updateItemFunction", getLambdaFunctionProps(myStack,role, lambdaEnvMap, "updateItem","py"));
-        Function deleteItemFunction = new Function(myStack, "deleteItemFunction", getLambdaFunctionProps(myStack,role, lambdaEnvMap, "deleteItem","py"));
+        Function createItemFunction = new Function(myStack, "createItemFunction", getLambdaFunctionProps(role,  "createItem","py"));
+        Function updateItemFunction = new Function(myStack, "updateItemFunction", getLambdaFunctionProps(role,  "updateItem","py"));
+        Function deleteItemFunction = new Function(myStack, "deleteItemFunction", getLambdaFunctionProps(role,  "deleteItem","py"));
+        Function getOneItemFunction = new Function(myStack, "getOneItemFunction", getLambdaFunctionProps(role, "getOneItem","py"));
+        Function getAllItemsFunction = new Function(myStack, "getAllItemsFunction", getLambdaFunctionProps(role,  "getAllItems","py"));
 
-
-
-        dynamodbTable.grantReadWriteData(getOneItemFunction);
-        dynamodbTable.grantReadWriteData(getAllItemsFunction);
         dynamodbTable.grantReadWriteData(createItemFunction);
         dynamodbTable.grantReadWriteData(updateItemFunction);
         dynamodbTable.grantReadWriteData(deleteItemFunction);
+        dynamodbTable.grantReadWriteData(getOneItemFunction);
+        dynamodbTable.grantReadWriteData(getAllItemsFunction);
 
-        RestApi api = new RestApi(myStack, "itemsApi",
-                RestApiProps.builder().restApiName("Items Service").build());
+        RestApi api = new RestApi(myStack, "itemsApi", RestApiProps.builder().restApiName("Items Service").build());
 
         IResource items = api.getRoot().addResource("items");
 
@@ -63,8 +50,6 @@ public class CreateDynamoDb {
         Integration createOneIntegration = new LambdaIntegration(createItemFunction);
         items.addMethod("POST", createOneIntegration);
         addCorsOptions(items);
-
-
 
         IResource singleItem = items.addResource("{id}");
         Integration getOneIntegration = new LambdaIntegration(getOneItemFunction);
@@ -78,6 +63,26 @@ public class CreateDynamoDb {
         addCorsOptions(singleItem);
     }
 
+    @NotNull
+    private static Map<String, String> createLambdaEnvMap(Table dynamodbTable) {
+        Map<String, String> lambdaEnvMap = new HashMap<>();
+        lambdaEnvMap.put("TABLE_NAME", dynamodbTable.getTableName());
+        lambdaEnvMap.put("PRIMARY_KEY","orderId");
+        return lambdaEnvMap;
+    }
+
+    // The default removal policy is RETAIN, which means that cdk destroy will not attempt to delete
+    // the new table, and it will remain in your account until manually deleted. By setting the policy to
+    // DESTROY, cdk destroy will delete the table (even if it has data in it)
+    private TableProps createTablePropsDynamoDB(MyStack myStack) {
+        TableProps tableProps;
+        Attribute partitionKey = Attribute.builder().name("orderId").type(AttributeType.STRING).build();
+        Attribute sortKey = Attribute.builder().name("orderDate").type(AttributeType.STRING).build();
+        tableProps = TableProps.builder().tableName("orders")
+                                         .partitionKey(partitionKey)
+                                         .sortKey(sortKey).removalPolicy(RemovalPolicy.DESTROY).build();
+        return tableProps;
+    }
 
 
     private void addCorsOptions(IResource item) {
@@ -118,13 +123,11 @@ public class CreateDynamoDb {
         item.addMethod("OPTIONS", methodIntegration, methodOptions);
     }
 
-    private FunctionProps getLambdaFunctionProps(MyStack myStack ,Role role, Map<String, String> lambdaEnvMap, String handler, String extension) {
-
+    private FunctionProps getLambdaFunctionProps(Role role, String nameFunction, String extension) {
         try{
-            String lambdaContent = readFileAsString("./lambda/".concat(handler).concat(".").concat(extension));
-
+            String lambdaContent = readFileAsString("./lambda/".concat(nameFunction).concat(".").concat(extension));
                return  FunctionProps.builder()
-                        .description("Lambda ".concat(handler))
+                        .description("Lambda ".concat(nameFunction))
                         .code(Code.fromInline(lambdaContent))
                         .handler("index.lambda_handler")
                         .role(role)

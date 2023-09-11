@@ -6,7 +6,6 @@ client = boto3.resource('dynamodb')
 
 def lambda_handler(event, context):
     print('Starting input lambda function call')
-    print(event['body'])
     table = client.Table('orders')
     myuuid = uuid.uuid4()
 
@@ -25,15 +24,9 @@ def lambda_handler(event, context):
             'Email': order['Email']
         }
     )
-
-    print(data)
     response = {
         'statusCode': 200,
         'body': json.dumps('successfully created item!'),
-        'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
+        'headers': { 'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
     }
-
     return response
