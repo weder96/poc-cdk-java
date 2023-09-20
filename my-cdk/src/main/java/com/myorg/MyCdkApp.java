@@ -11,7 +11,7 @@ public class MyCdkApp {
                 .account("710304818543")
                 .region("us-east-1")
                 .build()).build();
-        new MyStack(app, "MyStack", stackProps);
+        new MyStack(app, "dev", stackProps);
         app.synth();
     }
 }

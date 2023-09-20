@@ -41,7 +41,7 @@ public class CreateLambdaCron {
 
 
 
-            String lambdaContent = readFileAsString("./lambda/app.py");
+            String lambdaContent = readFileAsString("./lambdaSqs/app.py");
 
             SingletonFunction lambdaFunction =
                     SingletonFunction.Builder.create(myStack, "cdk-lambda-cron")
@@ -73,7 +73,7 @@ public class CreateLambdaCron {
     }
 
     // function to read the file content
-    public String readFileAsString(String fileName) throws Exception {
+    public static  String readFileAsString(String fileName) throws Exception {
         String data = "";
         try {
             data = new String(Files.readAllBytes(Paths.get(fileName)), "UTF-8");

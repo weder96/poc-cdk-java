@@ -14,16 +14,11 @@ public class MyStack extends Stack {
 
     public MyStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
-        createBucket();
-        //new CreateLambdaCron(this);
-        new CreateDynamoDb(this);
+        // new CreateBucket(this);
+        // new CreateLambdaCron(this);
+        // new CreateDynamoDb(this);
+        new CreateSqsAndSns(this);
     }
 
-    private void createBucket() {
-        // The code that defines your stack goes here
-        Bucket bucket = new Bucket(this, "MyBucket", new BucketProps.Builder()
-                .versioned(true)
-                .encryption(BucketEncryption.KMS_MANAGED)
-                .build());
-    }
+
 }
